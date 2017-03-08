@@ -100,15 +100,23 @@ namespace TodoApp.Api.Controllers
 
         [Route("")]
         // POST: api/Lists
-        [ResponseType(typeof(TodoList))]
-        public async Task<IHttpActionResult> PostTodoList(TodoList todoList)
+        [ResponseType(typeof(TodoListView))]
+        public async Task<IHttpActionResult> PostTodoList(TodoListView todoList)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.Lists.Add(todoList);
+            todoList.ListId = Guid.NewGuid();
+            todoList.CreatedDate = DateTime.Now;
+            var entity = new TodoList
+            {
+                ListId = todoList.ListId,
+                Name = todoList.Name,
+                CreatedDate = todoList.CreatedDate
+            };
+            db.Lists.Add(entity);
 
             try
             {
@@ -126,7 +134,7 @@ namespace TodoApp.Api.Controllers
                 }
             }
 
-            return CreatedAtRoute("DefaultApi", new { id = todoList.ListId }, todoList);
+            return CreatedAtRoute("DefaultApi", new { id = entity.ListId }, todoList);
         }
 
         // DELETE: api/Lists/5
